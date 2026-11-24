@@ -152,6 +152,71 @@ export default function FinancialAiLogsPage() {
               </SectionCard>
             )}
 
+            {/* Input vs Output comparison */}
+            <SectionCard title="User Inputs vs AI Outputs" description="Side-by-side comparison per user (most recent 50)">
+              {loading && !data ? (
+                <TableSkeleton rows={6} />
+              ) : !data || data.data.length === 0 ? (
+                <EmptyState message="No AI calls for the selected filters." />
+              ) : (
+                <>
+                  <div className="hidden lg:grid grid-cols-[80px_1fr_1fr_140px_90px] gap-4 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em]"
+                       style={{ borderBottom: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--ink-3)' }}>
+                    <span>User</span>
+                    <span>User Input</span>
+                    <span>AI Output</span>
+                    <span>Model</span>
+                    <span>When</span>
+                  </div>
+                  {data.data.map((row, i) => (
+                    <div key={`cmp-${row.id}`}
+                         className="grid grid-cols-1 lg:grid-cols-[80px_1fr_1fr_140px_90px] gap-2 lg:gap-4 px-3 md:px-5 py-4 items-start text-[12.5px] md:text-[13px]"
+                         style={{
+                           borderBottom: i < data.data.length - 1 ? '1px solid var(--line)' : 'none',
+                           background: 'var(--surface)',
+                         }}>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-mono font-semibold" style={{ color: 'var(--ink)' }}>
+                          #{row.user_key}
+                        </span>
+                        {row.language && <LangBadge lang={row.language} />}
+                      </div>
+                      <div className="rounded-[8px] p-2.5 lg:p-3"
+                           style={{ background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
+                        <p className="text-[10.5px] font-bold uppercase tracking-[0.04em] mb-1 lg:hidden"
+                           style={{ color: 'var(--ink-3)' }}>Input</p>
+                        <p className="whitespace-pre-wrap break-words leading-relaxed" style={{ color: 'var(--ink)' }}>
+                          {row.user_input ?? <span style={{ color: 'var(--ink-3)' }}>— no input recorded —</span>}
+                        </p>
+                      </div>
+                      <div className="rounded-[8px] p-2.5 lg:p-3"
+                           style={{ background: 'var(--accent-soft)', border: '1px solid var(--line)' }}>
+                        <p className="text-[10.5px] font-bold uppercase tracking-[0.04em] mb-1 lg:hidden"
+                           style={{ color: 'var(--ink-3)' }}>Output</p>
+                        <p className="whitespace-pre-wrap break-words leading-relaxed" style={{ color: 'var(--ink)' }}>
+                          {row.ai_output ?? <span style={{ color: 'var(--ink-3)' }}>— no output recorded —</span>}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-mono text-[11.5px] md:text-[12px] break-all" style={{ color: 'var(--ink-2)' }}>
+                          {row.model ?? '—'}
+                        </span>
+                        {row.used_fallback && (
+                          <span className="inline-flex rounded-full text-[10px] font-bold uppercase w-fit"
+                                style={{ padding: '2px 7px', background: 'var(--bad-soft)', color: 'var(--bad)' }}>
+                            fallback
+                          </span>
+                        )}
+                      </div>
+                      <span className="tabular-nums text-[11px] md:text-[12px]" style={{ color: 'var(--ink-3)' }}>
+                        {format(new Date(row.createdAt), 'MMM d, HH:mm')}
+                      </span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </SectionCard>
+
             {/* Filters */}
             <SectionCard title="Recent Calls" description="Latest AI calls with token usage and latency">
               <div className="flex flex-wrap items-center gap-2 px-3 sm:px-5 py-3"

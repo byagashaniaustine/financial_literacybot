@@ -88,6 +88,8 @@ export interface AiLog {
   cache_read_tokens: number | null;
   latency_ms: number | null;
   language: string | null;
+  user_input: string | null;
+  ai_output: string | null;
   createdAt: string;
 }
 
