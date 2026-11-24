@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { LayoutDashboard, HelpCircle, BookOpen, X, Sun, Moon, Users, Tag } from 'lucide-react';
+import { LayoutDashboard, HelpCircle, BookOpen, X, Sun, Moon, Users, Tag, Activity, Heart } from 'lucide-react';
 import type { Page } from '../types';
 import { AppContext } from '../context';
 
@@ -12,6 +12,8 @@ const PAGES: { id: Page; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'questions', label: 'Questions',  icon: HelpCircle      },
   { id: 'users',     label: 'Users',      icon: Users           },
   { id: 'topics',    label: 'Topics',     icon: Tag             },
+  { id: 'ai-logs',   label: 'AI Logs',    icon: Activity        },
+  { id: 'health',    label: 'Bot Health', icon: Heart           },
 ];
 
 interface Props {

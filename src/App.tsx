@@ -8,6 +8,8 @@ const FinancialPage          = lazy(() => import('./pages/FinancialPage'));
 const FinancialQuestionsPage = lazy(() => import('./pages/FinancialQuestionsPage'));
 const FinancialUsersPage     = lazy(() => import('./pages/FinancialUsersPage'));
 const FinancialTopicsPage    = lazy(() => import('./pages/FinancialTopicsPage'));
+const FinancialAiLogsPage    = lazy(() => import('./pages/FinancialAiLogsPage'));
+const FinancialHealthPage    = lazy(() => import('./pages/FinancialHealthPage'));
 
 export default function App() {
   const [page, setPage]               = useState<Page>('summary');
@@ -47,6 +49,8 @@ export default function App() {
             {page === 'questions' ? <FinancialQuestionsPage /> :
              page === 'users'     ? <FinancialUsersPage />     :
              page === 'topics'    ? <FinancialTopicsPage />    :
+             page === 'ai-logs'   ? <FinancialAiLogsPage />    :
+             page === 'health'    ? <FinancialHealthPage />    :
                                     <FinancialPage />}
           </Suspense>
         </main>

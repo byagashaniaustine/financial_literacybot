@@ -1,4 +1,4 @@
-import type { FinancialOverview, FinancialQuestionsResponse, FinancialUsersResponse, FinancialTopics, FinancialBotStatus, DayFilter } from '../types';
+import type { FinancialOverview, FinancialQuestionsResponse, FinancialUsersResponse, FinancialTopics, FinancialBotStatus, AiLogsResponse, BotHealth, DayFilter } from '../types';
 import { cacheGet, cacheGetStale, cacheIsFresh, cacheSet, cacheBust } from '../lib/cache';
 
 const BASE   = import.meta.env.VITE_FINANCIAL_BASE_URL || '';
@@ -92,6 +92,46 @@ export async function fetchFinancialTopics(days: DayFilter): Promise<FinancialTo
   const res = await fetchWithTimeout(url(`/insights/topics?days=${days}`), { headers: headers() });
   if (!res.ok) throw new Error(`Financial topics: ${res.status} ${res.statusText}`);
   const data: FinancialTopics = await res.json();
+  cacheSet(key, data);
+  return data;
+}
+
+// ─── AI Logs ─────────────────────────────────────────────────────────────────
+export function peekFinancialAiLogs(days: DayFilter, limit: number, offset: number, agentType: string, language: string, fallback: boolean): AiLogsResponse | null {
+  return cacheGetStale<AiLogsResponse>(`financial:ai-logs:${days}:${limit}:${offset}:${agentType}:${language}:${fallback}`);
+}
+export function isFreshFinancialAiLogs(days: DayFilter, limit: number, offset: number, agentType: string, language: string, fallback: boolean): boolean {
+  return cacheIsFresh(`financial:ai-logs:${days}:${limit}:${offset}:${agentType}:${language}:${fallback}`);
+}
+export async function fetchFinancialAiLogs(days: DayFilter, limit = 50, offset = 0, agentType = '', language = '', fallback = false): Promise<AiLogsResponse> {
+  const key = `financial:ai-logs:${days}:${limit}:${offset}:${agentType}:${language}:${fallback}`;
+  const hit = cacheGet<AiLogsResponse>(key);
+  if (hit) return hit;
+  const params = new URLSearchParams({ days: String(days), limit: String(limit), offset: String(offset) });
+  if (agentType) params.set('agent_type', agentType);
+  if (language) params.set('language', language);
+  if (fallback) params.set('fallback', 'true');
+  const res = await fetchWithTimeout(url(`/insights/ai-logs?${params}`), { headers: headers() });
+  if (!res.ok) throw new Error(`Financial AI logs: ${res.status} ${res.statusText}`);
+  const data: AiLogsResponse = await res.json();
+  cacheSet(key, data);
+  return data;
+}
+
+// ─── Bot Health ──────────────────────────────────────────────────────────────
+export function peekFinancialHealth(limit: number): BotHealth | null {
+  return cacheGetStale<BotHealth>(`financial:health:${limit}`);
+}
+export function isFreshFinancialHealth(limit: number): boolean {
+  return cacheIsFresh(`financial:health:${limit}`);
+}
+export async function fetchFinancialHealth(limit = 50): Promise<BotHealth> {
+  const key = `financial:health:${limit}`;
+  const hit = cacheGet<BotHealth>(key);
+  if (hit) return hit;
+  const res = await fetchWithTimeout(url(`/insights/health?limit=${limit}`), { headers: headers() }, 10_000);
+  if (!res.ok) throw new Error(`Financial health: ${res.status} ${res.statusText}`);
+  const data: BotHealth = await res.json();
   cacheSet(key, data);
   return data;
 }
